@@ -1,13 +1,16 @@
-from time import sleep
-from picamera import PiCamera
+from tcp_pickle_stream import listener
+from PIL import Image
+import cv2
 
-camera = PiCamera()
-camera.resolution = (1024, 768)
-camera.start_preview()
-# Camera warm-up time
-# hello
-sleep(2)
-camera.capture('foo.jpg')
+l = listener()
+
+while(1):
+    frame = l.get_frame()
+    img = Image.fromarray(frame)
+    cv2.imshow('test', frame)
+    cv2.waitKey(1)
+     
+
 
 
 
