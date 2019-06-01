@@ -16,14 +16,14 @@ with picamera.PiCamera() as camera:
 		for frame in camera.capture_continuous(stream, format="bgr", use_video_port=True):
 			image = frame.array
 
-			//get prediction of image
+			#get prediction of image
 			img = image.load_img(image, target_size=(224, 224))
 			x = image.img_to_array(img)
 			x = np.expand_dims(x, axis=0)
 			x = preprocess_input(x)
 
 			preds = model.predict(x)
-			//get prediction of image
+			#get prediction of image
 
 			s.send_frame(preds)
 			stream.truncate(0)
