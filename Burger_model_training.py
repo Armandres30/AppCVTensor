@@ -84,12 +84,24 @@ imagePaths = sorted(list(paths.list_images(args["dataset"])))
 random.seed(42)
 random.shuffle(imagePaths)
 
+# loop over the input images and delete broken ones
+for imagePath in imagePaths:
+	# load the image, pre-process it, and store it in the data list
+	image = cv2.imread(imagePath)
+	try:
+		image = cv2.resize(image, (64, 64))
+	except:
+		os.remove(imagePath)
+
 # loop over the input images
 for imagePath in imagePaths:
 	# load the image, pre-process it, and store it in the data list
 	image = cv2.imread(imagePath)
-	image = cv2.resize(image, (28, 28))
-	image = img_to_array(image)
+	try:
+		image = cv2.resize(image, (64, 64))
+		image = img_to_array(image)
+	except:
+		print(imagePath)
 	data.append(image)
  
 	# extract the class label from the image path and update the
@@ -111,18 +123,6 @@ labels = np.array(labels)
 trainY = to_categorical(trainY, num_classes=2)
 testY = to_categorical(testY, num_classes=2)
 
-# scale the raw pixel intensities to the range [0, 1]
-data = np.array(data, dtype="float") / 255.0
-labels = np.array(labels)
- 
-# partition the data into training and testing splits using 75% of
-# the data for training and the remaining 25% for testing
-(trainX, testX, trainY, testY) = train_test_split(data,
-	labels, test_size=0.25, random_state=42)
-
-# convert the labels from integers to vectors
-trainY = to_categorical(trainY, num_classes=2)
-testY = to_categorical(testY, num_classes=2)
 
 # construct the image generator for data augmentation
 aug = ImageDataGenerator(rotation_range=30, width_shift_range=0.1,
@@ -131,7 +131,7 @@ aug = ImageDataGenerator(rotation_range=30, width_shift_range=0.1,
 
 # initialize the model
 print("[INFO] compiling model...")
-model = LeNet.build(width=28, height=28, depth=3, classes=2) ###todo
+model = LeNet.build(width=64, height=64, depth=3, classes=2) ###todo
 opt=Adam(lr=INIT_LR, decay=INIT_LR / EPOCHS)
 model.compile(optimizer=opt,
             loss='binary_crossentropy', #loss is degree of error
