@@ -66,6 +66,88 @@ class LeNet:
 		# return the constructed network architecture
 		return model
 
+	@staticmethod
+	def build_more_layers(width, height, depth, classes): #desired res: 60x60
+		# initialize the model
+		model = Sequential()
+		inputShape = (height, width, depth)
+ 
+		# if we are using "channels first", update the input shape
+		if K.image_data_format() == "channels_first":
+			inputShape = (depth, height, width)
+        
+        	# first set of CONV => RELU => POOL layers
+		model.add(Conv2D(20, (5, 5), padding="same",
+			input_shape=inputShape))
+		model.add(Activation("relu"))
+		model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
+
+        # second set of CONV => RELU => POOL layers
+		model.add(Conv2D(50, (5, 5), padding="same"))
+		model.add(Activation("relu"))
+		model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
+
+		# third set of CONV => RELU => POOL layers
+		model.add(Conv2D(100, (5, 5), padding="same"))
+		model.add(Activation("relu"))
+		model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
+
+        # first (and only) set of FC => RELU layers
+		model.add(Flatten())
+		model.add(Dense(1600))
+		model.add(Activation("relu"))
+
+		model.add(Dense(800))
+		model.add(Activation("relu"))
+ 
+		# softmax classifier
+		model.add(Dense(classes))
+		model.add(Activation("softmax"))
+ 
+		# return the constructed network architecture
+		return model
+
+	@staticmethod
+	def build_more_resolution(width, height, depth, classes): #desired res: 92x92
+		# initialize the model
+		model = Sequential()
+		inputShape = (height, width, depth)
+ 
+		# if we are using "channels first", update the input shape
+		if K.image_data_format() == "channels_first":
+			inputShape = (depth, height, width)
+        
+        	# first set of CONV => RELU => POOL layers
+		model.add(Conv2D(20, (5, 5), padding="same",
+			input_shape=inputShape))
+		model.add(Activation("relu"))
+		model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
+
+        # second set of CONV => RELU => POOL layers
+		model.add(Conv2D(50, (5, 5), padding="same"))
+		model.add(Activation("relu"))
+		model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
+
+		# third set of CONV => RELU => POOL layers
+		model.add(Conv2D(100, (5, 5), padding="same"))
+		model.add(Activation("relu"))
+		model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
+
+        # first (and only) set of FC => RELU layers
+		model.add(Flatten())
+		model.add(Dense(3200))
+		model.add(Activation("relu"))
+
+		model.add(Dense(1600))
+		model.add(Activation("relu"))
+ 
+		# softmax classifier
+		model.add(Dense(classes))
+		model.add(Activation("softmax"))
+ 
+		# return the constructed network architecture
+		return model
+
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-d", "--dataset", required=True,
@@ -89,7 +171,8 @@ for imagePath in imagePaths:
 	# load the image, pre-process it, and store it in the data list
 	image = cv2.imread(imagePath)
 	try:
-		image = cv2.resize(image, (64, 64))
+		image = cv2.resize(image, (92, 92))
+		image = img_to_array(image)
 	except:
 		os.remove(imagePath)
 
@@ -98,7 +181,7 @@ for imagePath in imagePaths:
 	# load the image, pre-process it, and store it in the data list
 	image = cv2.imread(imagePath)
 	try:
-		image = cv2.resize(image, (64, 64))
+		image = cv2.resize(image, (92, 92))
 		image = img_to_array(image)
 	except:
 		print(imagePath)
@@ -131,7 +214,7 @@ aug = ImageDataGenerator(rotation_range=30, width_shift_range=0.1,
 
 # initialize the model
 print("[INFO] compiling model...")
-model = LeNet.build(width=64, height=64, depth=3, classes=2) ###todo
+model = LeNet.build_more_resolution(width=92, height=92, depth=3, classes=2) ###todo
 opt=Adam(lr=INIT_LR, decay=INIT_LR / EPOCHS)
 model.compile(optimizer=opt,
             loss='binary_crossentropy', #loss is degree of error

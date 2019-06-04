@@ -5,20 +5,17 @@ import cv2
 import os
 
 ap = argparse.ArgumentParser()
-ap.add_argument("-u", "--urls", required=True,
-	help="urls.txt")
 ap.add_argument("-o", "--output", required=True,
 	help="urls.txt")
 args = vars(ap.parse_args())
  
 # grab the list of URLs from the input file, then initialize the
 # total number of images downloaded thus far
-rows = open(args["urls"]).read().strip().split("\n")
 total = 0
 
-url="https://picsum.photos/200/300";
+url="https://picsum.photos/200/300"
 #for url in rows:
-for i in range(500):
+for i in range(1000):
 
 	try:
 		# try to download the image
